@@ -3,6 +3,6 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
               'NAME'	   => 'Async::Group',
-              'VERSION' => '0.1',
+              'VERSION' => '0.2',
               'dist' => {COMPRESS=>'gzip -9f', SUFFIX => 'gz'}
              );

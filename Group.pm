@@ -56,11 +56,11 @@ sub run
 
     foreach (qw/set callback/)
       {
-        croak( "No $_ passed to asyncCall::run\n") unless 
+        croak( "No $_ passed to Async::Group::run\n") unless 
           defined $args{$_};
       }
     
-    croak( "$self->name:asyncCall: set parameter is not an array ref\n")
+    croak( "$self->name:Async::Group: set parameter is not an array ref\n")
       unless ref($args{set}) eq 'ARRAY' ;
 
     # initialize 
@@ -96,13 +96,13 @@ sub callDone
     #store results
     $self->{out} .= $str if defined $str ;
     $self->{result} &&= $result ;
-    $self->printEvent("asyncCall done ($result), ". 
+    $self->printEvent("Async::Group call done ($result), ". 
                       -- $self->{onGoing}
                       ." left to do\n");
 	
     unless ($self->{onGoing})
       {
-        $self->printEvent("asyncCall finished, global result is $result\n") ;
+        $self->printEvent("Async::Group finished, global result is $result\n") ;
         my $cb = $self->{'callback'} ;
         &$cb($self->{result},$self->{out});
       }
