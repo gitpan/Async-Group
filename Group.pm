@@ -1,10 +1,10 @@
 ############################################################
 #
-# $Header: /mnt/barrayar/d06/home/domi/Tools/perlDev/Async_Group/Async/Group.pm,v 1.1 1998/07/03 15:12:20 domi Exp domi $
+# $Header: /mnt/barrayar/d06/home/domi/Tools/perlDev/Async_Group/RCS/Group.pm,v 1.2 1998/11/20 12:31:02 domi Exp $
 #
-# $Source: /mnt/barrayar/d06/home/domi/Tools/perlDev/Async_Group/Async/Group.pm,v $
-# $Revision: 1.1 $
-# $Locker: domi $
+# $Source: /mnt/barrayar/d06/home/domi/Tools/perlDev/Async_Group/RCS/Group.pm,v $
+# $Revision: 1.2 $
+# $Locker:  $
 # 
 ############################################################
 
@@ -15,7 +15,7 @@ use Carp ;
 
 use strict ;
 use vars qw($VERSION) ;
-$VERSION =  substr q$Revision: 1.1 $, 10;
+$VERSION =  substr q$Revision: 1.2 $, 10;
 
 # see loadspecs for other names
 sub new 
@@ -31,6 +31,12 @@ sub new
       }
     
     bless $self,$type ;
+  }
+
+sub getCbRef
+  {
+    my $self = shift;
+    return sub{$self->callDone(@_)} ;
   }
 
 sub printEvent
@@ -102,7 +108,9 @@ sub callDone
 	
     unless ($self->{onGoing})
       {
-        $self->printEvent("Async::Group finished, global result is $result\n") ;
+        $self->printEvent
+          ("Async::Group finished, global result is $self->{result}\n"
+           .$self->{out}) ;
         my $cb = $self->{'callback'} ;
         &$cb($self->{result},$self->{out});
       }
@@ -141,26 +149,34 @@ Async::Group - Perl class to deal with simultaneous asynchronous calls
         callback => \&allDone 
        )
 
+ # or another way which avoids the clumsy nested subs
+ my $cb = $a->getCbRef();
+ $a->run(set => [ sub {&sub1( callback => $cb)},
+                  sub {&nsub1( callback => $cb )} ],
+        callback => \&allDone 
+       )
+
+
 =head1 DESCRIPTION
 
-If you sometimes have to launch several asynchronous calls in parrallel and
-want to call one call-back function when all these calls are finished, this
-module may be for you.
+If you sometimes have to launch several asynchronous calls in
+parrallel and want to call one call-back function when all these calls
+are finished, this module may be for you.
 
-Async::Group is a class which enables you to call several asynchronous routines.
-Each routine may have their own callback. When all the routine are over (i.e.
-all their callback were called), Async::Group will call the global callback 
-given by the user.
+Async::Group is a class which enables you to call several asynchronous
+routines.  Each routine may have their own callback. When all the
+routine are over (i.e.  all their callback were called), Async::Group
+will call the global callback given by the user.
 
-Note that one Async::Group objects must be created for each group of parrallel
-calls. This object may be destroyed (or will vanish itself) once the 
-global callback is called.
+Note that one Async::Group objects must be created for each group of
+parrallel calls. This object may be destroyed (or will vanish itself)
+once the global callback is called.
 
-Note also that Async::Group does not perform any fork or other system calls. 
-It just run the passed subroutines and keep count of the call-back
-functions called by the aforementionned subroutines. When all these
-subs are finished, it calls another call-back (passed by the user) to
-perform whatever function required by the user.
+Note also that Async::Group does not perform any fork or other system
+calls.  It just run the passed subroutines and keep count of the
+call-back functions called by the aforementionned subroutines. When
+all these subs are finished, it calls another call-back (passed by the
+user) to perform whatever function required by the user.
 
 Using fork or threads or whatever is left to the user.
 
@@ -187,10 +203,23 @@ parameters are :
 Function to be called back each time an asynchronous call is finished.
 
 When all function calls are over (i.e. all call-back were performed)
-all the returned results are logically 'anded', the passed strings are 
-concatenated and the resulting result
-is passed to the global user call-back function passed with the run()
-method.
+all the returned results are logically 'anded', the passed strings are
+concatenated and the resulting result is passed to the global user
+call-back function passed with the run() method.
+
+=head2 getCbRef()
+
+Syntactic sugar to avoid nested subs when defining the set of routines
+that must be run in parrallel. This function will return a sub ref
+that can be used as a callback function by the user's routine.
+
+So you may call run() with the following sequence :
+
+ my $cb = $a->getCbRef();
+ $a->run(set => [ sub {&sub1( callback => $cb)},
+                  sub {&nsub1( callback => $cb )} ],
+        callback => \&allDone 
+       )
 
 =head1 AUTHOR
 

@@ -8,6 +8,7 @@
 
 BEGIN { $| = 1; print "1..1\n"; }
 END {print "not ok 1\n" unless $loaded;}
+use ExtUtils::testlib;
 use Async::Group ;
 $loaded = 1;
 print "ok 1\n";
@@ -45,10 +46,11 @@ sub allDone
   }
 
 my $a = Async::Group->new(name => 'aTest', test => $trace) ;
+my $cb = $a->getCbRef();
 
-$a->run(set => [ sub {&sub1( callback => sub {$a->callDone(@_)} )},
-                 sub {&sub1( callback => sub {$a->callDone(@_)} )},
-                 sub {&nsub1( callback => sub {$a->callDone(@_)} )},
-                 sub {&nsub1( callback => sub {$a->callDone(@_)} )} ],
+$a->run(set => [ sub {&sub1( callback => $cb)},
+                 sub {&sub1( callback => $cb)},
+                 sub {&nsub1( callback => $cb )},
+                 sub {&nsub1( callback => $cb )} ],
         callback => \&allDone 
        )

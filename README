@@ -1,22 +1,22 @@
 
-If you sometimes have to launch several asynchronous calls in parrallel and
-want to call one call-back function when all these calls are finished, this
-module may be for you.
+If you sometimes have to launch several asynchronous calls in
+parrallel and want to call one call-back function when all these calls
+are finished, this module may be for you.
 
-Async::Group is a class which enables you to call several asynchronous routines.
-Each routine may have their own callback. When all the routine are over (i.e.
-all their callback were called), Async::Group will call the global callback 
-given by the user.
+Async::Group is a class which enables you to call several asynchronous
+routines.  Each routine may have their own callback. When all the
+routine are over (i.e.  all their callback were called), Async::Group
+will call the global callback given by the user.
 
-Note that one Async::Group objects must be created for each group of parrallel
-calls. This object may be destroyed (or will vanish itself) once the 
-global callback is called
+Note that one Async::Group objects must be created for each group of
+parrallel calls. This object may be destroyed (or will vanish itself)
+once the global callback is called
 
-Note also that Async::Group does not perform any fork or other system calls. 
-It just run the passed subroutines and keep count of the call-back
-functions called by the aforementionned subroutines. When all these
-subs are finished, it calls another call-back (passed by the user) to
-perform whatever function required by the user.
+Note also that Async::Group does not perform any fork or other system
+calls.  It just run the passed subroutines and keep count of the
+call-back functions called by the aforementionned subroutines. When
+all these subs are finished, it calls another call-back (passed by the
+user) to perform whatever function required by the user.
 
 Using fork or threads or whatever is left to the user.
 
